@@ -1,7 +1,9 @@
 import os
+import sys
 import time
 from typing import List, Tuple
 
+import pandas as pd
 import requests
 import vk_api
 from vk_api import audio
@@ -13,6 +15,7 @@ from Crypto.Util.Padding import unpad
 REQUEST_STATUS_CODE = 200
 DEFAULT_SAVE_DIR = "music/"
 TEMP_AUDIO_FILE_NAME = "temp.ts"
+DEFAULT_PATH_TO_HISTORY="history.txt"
 
 
 def two_factor():
@@ -177,14 +180,56 @@ class MusicDownloader:
 
 
 def main():
+    try:
+        path_to_tracks = sys.argv[1]
+    except:
+        print("ERROR\nUSAGE: python3 {} PATH_TO_TRACKS.csv [PATH_TO_HISTORY.txt]".format(os.path.basename(sys.argv[0])), file=sys.stderr)
+        exit(1)
+
+    path_to_history = sys.argv[2] if len(sys.argv) == 3 else DEFAULT_PATH_TO_HISTORY
+    n = 100000
+
+    if os.path.exists(path_to_tracks):
+        df = pd.read_csv(path_to_tracks)
+    else:
+        raise("Path '{}' doesn't exist".format(path_to_tracks))
+    
+    history = set()
+    if os.path.exists(path_to_history):
+        with open(path_to_history) as fin:
+            for line in fin:
+                history.add(line.strip())
+        df = df[~df.vk_id.isin(history)]
+    else:
+        print("history is empty", file=sys.stderr)
+
+    history_file = open(path_to_history, "a")
+
     login = os.environ.get("VK_LOGIN")
     password = os.environ.get("VK_PASSWORD")
 
     downloader = MusicDownloader(login=login, password=password)
 
-    owner_id = 371745470
-    audio_id = 456463164
-    downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
+    # owner_id = 371745470
+    # audio_id = 456463164
+    # downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
+    for i, vk_id in enumerate(df.vk_id.values):
+        print("Processing '{}'".format(vk_id))
+        owner_id, audio_id = map(int, vk_id.split("_"))
+        try:
+            downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
+        except Exception as e:
+            print("-------------------\nERROR")
+            print(e)
+            print(e.args)
+            print("-------------------")
+
+        history_file.write(vk_id + "\n")
+        time.sleep(5)
+        if i == n:
+            break
+
+    history_file.close()
 
 
 if __name__ == "__main__":
