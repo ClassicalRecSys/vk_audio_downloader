@@ -15,10 +15,18 @@ DEFAULT_SAVE_DIR = "music/"
 TEMP_AUDIO_FILE_NAME = "temp.ts"
 
 
+def two_factor():
+    code = input('Code? ')
+    return code, True
+
+
 class MusicDownloader:
     def __init__(self, login: str, password: str, save_dir: str = None):
-        self._vk_session = vk_api.VkApi(login=login,
-                                        password=password)
+        self._vk_session = vk_api.VkApi(
+            login=login,
+            password=password, 
+            auth_handler=two_factor,
+        )
         self._vk_session.auth()
         self._vk_audio = audio.VkAudio(self._vk_session)
         self.save_dir = save_dir or DEFAULT_SAVE_DIR
@@ -169,13 +177,14 @@ class MusicDownloader:
 
 
 def main():
-    login = ""
-    password = ""
+    login = os.environ.get("VK_LOGIN")
+    password = os.environ.get("VK_PASSWORD")
+
     downloader = MusicDownloader(login=login, password=password)
 
     owner_id = 371745470
     audio_id = 456463164
-    downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True)
+    downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
 
 
 if __name__ == "__main__":
