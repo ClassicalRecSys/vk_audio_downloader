@@ -188,7 +188,6 @@ def main():
         exit(1)
 
     path_to_history = sys.argv[2] if len(sys.argv) == 3 else DEFAULT_PATH_TO_HISTORY
-    n = 100000
 
     if os.path.exists(path_to_tracks):
         df = pd.read_csv(path_to_tracks)
@@ -227,8 +226,8 @@ def main():
 
         history_file.write(vk_id + "\n")
         time.sleep(5)
-        if i == n:
-            break
+        if i % 20 == 0:
+            time.sleep(15)
 
     history_file.close()
 
