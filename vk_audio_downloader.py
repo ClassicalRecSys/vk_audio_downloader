@@ -31,6 +31,7 @@ class MusicDownloader:
             auth_handler=two_factor,
         )
         self._vk_session.auth()
+        print("вошел в {}".format(login), file=sys.stderr)
         self._vk_audio = audio.VkAudio(self._vk_session)
         self.save_dir = save_dir or DEFAULT_SAVE_DIR
         self.temp_file_path = f"{self.save_dir}/{TEMP_AUDIO_FILE_NAME}"
@@ -217,7 +218,7 @@ def main():
         print("Processing '{}'".format(vk_id))
         owner_id, audio_id = map(int, vk_id.split("_"))
         try:
-            downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
+            downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=False)
         except Exception as e:
             print("-------------------\nERROR")
             print(e)
