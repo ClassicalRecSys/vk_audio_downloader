@@ -1,7 +1,7 @@
 import os
+import random
 import sys
 import time
-import random
 from typing import List, Tuple
 
 import m3u8
@@ -62,7 +62,7 @@ class MusicDownloader:
             self._write_to_file(segments_binary_data, path=audio_path)
 
         if verbose:
-            print(f"{audio_name} saved in {time.time() - start} sec")
+            print(f"{audio_name} saved in {time.time() - start:.2f} sec")
 
     def _get_m3u8_by_id(self, owner_id: int, audio_id: int) -> Tuple:
         """
