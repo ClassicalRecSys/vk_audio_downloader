@@ -1,16 +1,16 @@
 import os
 import sys
 import time
+import random
 from typing import List, Tuple
 
+import m3u8
 import pandas as pd
 import requests
 import vk_api
-from vk_api import audio
-import m3u8
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
-
+from vk_api import audio
 
 REQUEST_STATUS_CODE = 200
 DEFAULT_SAVE_DIR = "music/"
@@ -214,20 +214,20 @@ def main():
     # audio_id = 456463164
     # downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
     for i, vk_id in enumerate(df.vk_id.values):
-        print("Processing '{}'".format(vk_id))
+        print("{}. Processing '{}'".format(i, vk_id))
         owner_id, audio_id = map(int, vk_id.split("_"))
         try:
             downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=False)
         except Exception as e:
             print("-------------------\nERROR")
-            print(e)
-            print(e.args)
+            print(repr(e))
+            print(e.__doc__)
             print("-------------------")
 
         history_file.write(vk_id + "\n")
-        time.sleep(5)
+        time.sleep(random.randint(2, 6))
         if i % 20 == 0:
-            time.sleep(15)
+            time.sleep(random.randint(8, 13))
 
     history_file.close()
 
