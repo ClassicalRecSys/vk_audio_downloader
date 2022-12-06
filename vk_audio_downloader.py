@@ -191,6 +191,7 @@ def main():
 
     if os.path.exists(path_to_tracks):
         df = pd.read_csv(path_to_tracks)
+        print("df.shape =", df.shape)
     else:
         raise("Path '{}' doesn't exist".format(path_to_tracks))
     
@@ -200,6 +201,7 @@ def main():
             for line in fin:
                 history.add(line.strip())
         df = df[~df.vk_id.isin(history)]
+        print("df.shape after filtration =", df.shape)
     else:
         print("history is empty", file=sys.stderr)
 

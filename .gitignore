@@ -6,4 +6,5 @@
 music/
 *.json
 *.csv
-history.txt
+history*.txt
+nohup*
