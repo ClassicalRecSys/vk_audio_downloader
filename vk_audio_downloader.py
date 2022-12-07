@@ -215,18 +215,27 @@ def main():
     # owner_id = 371745470
     # audio_id = 456463164
     # downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=True)
+    ntries = 0
     for i, vk_id in enumerate(df.vk_id.values):
         print("{}. Processing '{}'".format(i, vk_id))
         owner_id, audio_id = map(int, vk_id.split("_"))
         try:
             downloader.download_audio_by_id(owner_id=owner_id, audio_id=audio_id, verbose=True, convert_to_mp3=False)
+            ntries = 0
+        except StopIteration as e:
+            print("ERROR {}".format(repr(e)))
         except Exception as e:
+            ntries += 1
             print("-------------------\nERROR")
             print(repr(e))
             print(e.__doc__)
             print("-------------------")
 
         history_file.write(vk_id + "\n")
+
+        if ntries == 10:
+            break
+
         time.sleep(random.randint(2, 6))
         if i % 20 == 0:
             time.sleep(random.randint(8, 13))
@@ -235,4 +244,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    for _ in range(10):
+        main()
+        time.sleep(random.randint(60, 120))
